@@ -1,0 +1,26 @@
+<main>
+    <div class="container">
+        {{#if role}}
+            <h2>Si puede ver los productos</h2>
+            <div class="row">
+                {{#each productAll}}
+                    <div class="col-md-3">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Código del producto: {{this.id}}</h5>
+                                <p class="card-text">Nombre del producto: {{this.title}}</p>
+                                <p class="card-text">Precio: {{this.price}}</p>
+                                <p class="card-text">Código: {{this.code}}</p>
+                                <p class="card-text">Stock: {{this.stock}}</p>
+                            </div>
+                        </div>
+                    </div>
+                {{/each}}
+            </div>
+        {{else}}
+            <h2>No puede ver los productos</h2>
+        {{/if}}
+    </div>
+</main>
+<script src="/css/homeStyles.css"></script>
+

@@ -1,0 +1,68 @@
+# Users
+GET http://localhost:8080/api/users/663da9060bfa8fc3ecceaf62
+
+###
+POST http://localhost:8080/api/users
+Content-Type: application/json
+
+{
+    "first_name": "Ekroug",
+    "last_name": "Ekroug",
+    "email": "ekroug@unesco.org",
+    "gender": "Male"
+}
+###
+GET http://localhost:8080/api/users/663da9060bfa8fc3ecceaf62
+###
+PUT http://localhost:8080/api/users/663da9060bfa8fc3ecceaf62
+Content-Type: application/json
+
+{
+    "first_name": "EKROUG",
+    "last_name": "EKROUG",
+    "email": "EKROUG@unesco.org",
+    "gender": "Famale"
+}
+###
+DELETE http://localhost:8080/api/users/663d6c6eec128caebd1e9ea3
+
+### Products
+GET http://localhost:8080/api/products/
+
+### Products by id
+GET http://localhost:8080/api/products/663e30f513e7844c96ccf539
+
+###
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{
+    "title": "Fideos",
+    "description": "Este producto no es una prueba",
+    "code": "1232",
+    "price": 1600,
+    "status": true,
+    "stock": 100,
+    "category": "almacen",
+    "thumbnail": "Con imagen"
+}
+###
+PUT http://localhost:8080/api/products/6640f3d9e90740a45e947333
+Content-Type: application/json
+
+{
+    "title": "Fideos"
+}
+###
+DELETE http://localhost:8080/api/products/6640f3d9e90740a45e947333
+
+### Carts
+GET http://localhost:8080/api/carts
+
+### Create Cart
+POST http://localhost:8080/api/carts
+
+### Add products in carts
+POST http://localhost:8080/api/carts/6642746f30b2cbd35e7fa678/products/6640f6095b6932fb6acbcc97
+
+
