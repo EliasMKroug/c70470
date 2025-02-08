@@ -74,7 +74,6 @@ router.get('/', (req, res) => {
     let productsAll = productManager.getProducts()
     const limit = parseInt(req.query.limit);
     if (limit) {
-        console.log(limit)
         res.json(productsAll.slice(0, limit));
     } else {
         res.json(productsAll);

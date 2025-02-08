@@ -1,0 +1,13 @@
+[
+  {
+    "id": 1,
+    "title": "Arroz",
+    "description": "Este producto no es una prueba",
+    "code": "1231",
+    "price": 1500,
+    "status": true,
+    "stock": 150,
+    "category": "almacen",
+    "thumbnail": "Con imagen"
+  }
+]

@@ -6,8 +6,7 @@ import handlebars from 'express-handlebars'
 import productsRouter from './routes/products.route.js'
 import productsCarts from './routes/carts.route.js'
 import viewsRouter from './routes/views.route.js'
-//import realTimeProducts from './routes/realTimeProducts.route.js'
-import realTimeProducts, { setupSocket } from './routes/realTimeProducts.route.js';
+import realTimeProducts from './routes/realTimeProducts.route.js'
 
 //Variables globales
 const app = express()
@@ -28,9 +27,26 @@ app.set('view engine', 'handlebars')
 //Server Socket
 const mensajeslogs = []
 
-// Configurar Socket.IO
-setupSocket(socketServer);
+socketServer.on('connection', socket => {
+    console.log('Nuevo cliente conectado!, se conecto ->', socket.id)
+    socket.on('message', data => {
+        console.log(data)
+        mensajeslogs.push(data)
+        socketServer.emit('logs', mensajeslogs)
+    })
 
+    socket.on('new-user', username => {
+        socket.broadcast.emit('new-user', username)
+    })
+})
+
+socketServer.on('connection', async (socket) => {
+    console.log('Nuevo cliente conectado!, se conecto ->', socket.id)
+
+    // Enviar lista de productos al cliente
+    const products = await readProducts();
+    socket.emit('updateProducts', products);
+});
 
 //Rutas
 app.use('/api/products', productsRouter)

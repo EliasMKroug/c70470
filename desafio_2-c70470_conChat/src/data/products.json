@@ -11,6 +11,17 @@
     "thumbnail": "Con imagen"
   },
   {
+    "id": 2,
+    "title": "Nuez",
+    "description": "Este producto no es una prueba",
+    "code": "1237",
+    "price": 2100,
+    "status": true,
+    "stock": 110,
+    "category": "almacen",
+    "thumbnail": "Sin imagen"
+  },
+  {
     "id": 3,
     "title": "Almendra",
     "description": "Este producto no es una prueba",
@@ -18,26 +29,6 @@
     "price": 200,
     "status": true,
     "stock": 140,
-    "category": "almacen",
-    "thumbnail": "Sin imagen"
-  },
-  {
-    "id": 4,
-    "title": "Fideo",
-    "code": "1239",
-    "price": 200,
-    "status": true,
-    "stock": 100,
-    "category": "almacen",
-    "thumbnail": "Sin imagen"
-  },
-  {
-    "id": 2,
-    "title": "Nuez",
-    "code": "1235",
-    "price": 2500,
-    "stock": 150,
-    "status": true,
     "category": "almacen",
     "thumbnail": "Sin imagen"
   }
