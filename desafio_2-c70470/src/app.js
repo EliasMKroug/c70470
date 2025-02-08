@@ -6,7 +6,6 @@ import handlebars from 'express-handlebars'
 import productsRouter from './routes/products.route.js'
 import productsCarts from './routes/carts.route.js'
 import viewsRouter from './routes/views.route.js'
-//import realTimeProducts from './routes/realTimeProducts.route.js'
 import realTimeProducts, { setupSocket } from './routes/realTimeProducts.route.js';
 
 //Variables globales
@@ -25,12 +24,8 @@ app.engine('handlebars', handlebars.engine())
 app.set('views', __dirname+'/views' )
 app.set('view engine', 'handlebars')
 
-//Server Socket
-const mensajeslogs = []
-
 // Configurar Socket.IO
 setupSocket(socketServer);
-
 
 //Rutas
 app.use('/api/products', productsRouter)
@@ -49,6 +44,6 @@ httpServer.listen(PORT,error => {
     if(error){
         console.log(error)
     }
-    console.log('Server escuchando en el puerto 8080')
+    console.log(`Server escuchando en el puerto ${PORT}`)
 
 })

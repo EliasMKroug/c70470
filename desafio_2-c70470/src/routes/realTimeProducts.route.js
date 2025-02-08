@@ -41,6 +41,7 @@ class ProductManager {
 
     getNextAvailableId() {
         if (this.products.length === 0) return 1; // Si no hay productos, comenzamos en 1
+
         const ids = this.products.map(p => p.id).sort((a, b) => a - b);
         for (let i = 1; i <= ids.length; i++) {
             if (!ids.includes(i)) {
@@ -67,20 +68,27 @@ router.get('/', (req, res) => {
 export const setupSocket = (socketServer) => {
     socketServer.on('connection', (socket) => {
         console.log('Nuevo cliente conectado!, se conectó ->', socket.id);
+
+        // Enviar la lista de productos al cliente al conectarse
         socket.emit('update-products', productManager.getProducts());
-        // Agregar producto
+
+        // Manejo de evento para agregar producto desde el cliente
         socket.on('add-product', (productData) => {
             try {
-                io.emit('update-products', productManager.getProducts()); // Actualizar todos los clientes
+                const newProduct = productManager.addProduct(productData);
+                socketServer.emit('update-products', productManager.getProducts()); // Actualizar todos los clientes
+                console.log('Producto agregado:', newProduct);
             } catch (error) {
                 socket.emit('error-message', error.message);
             }
         });
-        // Eliminar producto
+
+        // Manejo de evento para eliminar producto
         socket.on('delete-product', ({ id }) => {
             try {
-                productManager.deleteProduct(id);
-                io.emit('update-products', productManager.getProducts()); // Actualizar todos los clientes
+                const delProduct = productManager.deleteProduct(id);
+                socketServer.emit('update-products', productManager.getProducts()); // Actualizar todos los clientes
+                console.log('Producto eliminado:', delProduct);
             } catch (error) {
                 socket.emit('error-message', error.message);
             }
