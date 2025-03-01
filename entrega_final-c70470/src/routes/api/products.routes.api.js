@@ -1,10 +1,10 @@
 import { Router } from 'express'
 //import { productsModel } from '../../model/products.model.js'
-import productsManager from '../../dao/productsManagerMongo.js'
+import productsMongo from '../../dao/products.dao.js'
 
 const router = Router()
 
-const productManager = new productsManager
+const productManager = new productsMongo
 
 //Enpoint productos
 router.get('/', async (req, res) => {
@@ -21,17 +21,15 @@ router.get('/:uid', async (req, res) => {
 
 //Endpoint creacion de producto
 router.post('/', async (req, res)=>{
-        const { body } = req
-        const newProduct = await productManager.addProduct(body)
-        res.send({status: 'success', payload: newProduct})
+    const { body } = req
+    const newProduct = await productManager.addProduct(body)
+    res.send({status: 'success', payload: newProduct})
 })
 
 //Endpoint actualizar producto
 router.put('/:pid', async (req, res) => {
     const { pid } = req.params
     const { body } = req
-    //res.send(pid)
-    //res.send(body)
     const updateProduct = await productManager.updateProduct(pid,body)
     res.send({status: 'success', message: `Product ${pid} updated`, payload: updateProduct})
 })
@@ -40,7 +38,7 @@ router.put('/:pid', async (req, res) => {
 router.delete('/:pid', async (req, res) => {
     const { pid } = req.params
     const productDel = await productManager.deleteProduct(pid)
-    res.send({ status: 'success', payload: `Product ${pid} deleted` });
+    res.send({ status: 'success', message: `Product ${pid} deleted`, payload: productDel});
 })
 
 

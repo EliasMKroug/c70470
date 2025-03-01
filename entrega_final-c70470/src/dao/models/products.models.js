@@ -18,6 +18,7 @@ const productsSchema = new Schema({
 
 })
 
-//ODM
 
+
+//ODM
 export const productsModel = model(productsCollection, productsSchema)

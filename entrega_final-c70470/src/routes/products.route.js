@@ -15,6 +15,8 @@ class ProductManager {
     }
   
     getProducts() {
+        //return this.products.sort((a, b) => a.id - b.id);
+        console.log(this.products)
         return this.products;
     }
 
@@ -74,11 +76,22 @@ router.get('/', (req, res) => {
     let productsAll = productManager.getProducts()
     const limit = parseInt(req.query.limit);
     if (limit) {
+        console.log(limit)
         res.json(productsAll.slice(0, limit));
     } else {
         res.json(productsAll);
     }
 })
+
+router.get('/', (req, res) => {
+    let productsAll = productManager.getProducts().sort((a, b) => a.id - b.id);
+    const limit = parseInt(req.query.limit);
+    if (limit) {
+        res.json(productsAll.slice(0, limit));
+    } else {
+        res.json(productsAll);
+    }
+});
 
 //Endpoint para filtar producto especifico
 router.get('/:pid', (req, res) => {
@@ -94,15 +107,12 @@ router.get('/:pid', (req, res) => {
 //Endpoint para agregar producto
 router.post('/', (req, res) => {
     try {
-
         // Extraer los datos del cuerpo de la solicitud
         const { title, description, code, price, status, stock, category, thumbnail } = req.body;
-        
         // Verificar si todos los campos obligatorios están presentes
         if (!title || !description || !code || !price || !status || !stock || !category) {
             throw new Error('Todos los campos son obligatorios.');
         }
-
         // Crear el nuevo objeto de producto
         const newProduct = {
             id: productManager.nextId++,
@@ -115,9 +125,7 @@ router.post('/', (req, res) => {
             category,
             thumbnail:"Sin imagen"
         };
-
         productManager.addProduct(newProduct);
-        
         res.status(201).json(newProduct);
     } catch (error) {
         res.status(400).json({ error: error.message });

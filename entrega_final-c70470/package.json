@@ -1,7 +1,7 @@
 {
-  "description": "Correccion de preentrega 1",
+  "description": "desafio 2",
   "name": "preentrega-proyecto",
-  "version": "2.0.0",
+  "version": "1.0.0",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -13,13 +13,11 @@
   "author": "Elias Kroug",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.4.7",
     "express": "^4.19.2",
-    "express-handlebars": "^7.1.2",
-    "mongoose": "^8.3.4",
-    "multer": "^1.4.5-lts.1",
-    "socket.io": "^4.7.5"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.0"
+    "express-handlebars": "^8.0.1",
+    "mongoose": "^8.10.1",
+    "nodemon": "^3.1.0",
+    "socket.io": "^4.8.1"
   }
 }

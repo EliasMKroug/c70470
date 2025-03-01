@@ -99,6 +99,8 @@ class cartsManager {
         }
     }
     
+
+
     loadNextId() {
         try {
             const data = fs.readFileSync(this.path, 'utf8')

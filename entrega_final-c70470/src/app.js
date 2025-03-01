@@ -1,52 +1,54 @@
 import express from 'express'
-import { __dirname } from './utils.js'
-import productsRouter from './routes/products.route.js'
-import productsApiRouter from './routes/api/products.router.js'
-import productsCarts from './routes/carts.route.js'
-import handlebars from 'express-handlebars'
-import viewsRouter from './routes/views.route.js'
-import usersRouter from './routes/api/users.route.js'
-import cartsApiRouter from './routes/api/carts.route.js'
-//socket.io
-import { Server as ServerIO } from 'socket.io'
+import { Server as ServerIO} from 'socket.io'
 import { Server as ServerHttp } from 'http'
-import { productsSocket } from './utils/productsSocket.js'
-import { connectDb } from './config/index.js'
+import handlebars from 'express-handlebars'
+import { __dirname } from './utils.js'
+
+//  Rutas de Socket.IO  
+import realTimeProducts, { setupSocket } from './routes/realTimeProducts.route.js';
+
+//Rutas
+import { connectToMongo } from './connections/db.conections.js'
+import productsRouter from './routes/products.route.js'
+import productsCarts from './routes/carts.route.js'
+import viewsRouter from './routes/views.route.js'
+import producsApiRoutes from './routes/api/products.routes.api.js'
+import cartApiRoutes from './routes/api/carts.api.routes.js'
+
 
 //Variables globales
 const app = express()
-const PORT = process.env.PORT || 8080
+const PORT = process.env.PORT || 8080 
 const httpServer = new ServerHttp(app)
-const io = new ServerIO(httpServer)
+const socketServer = new ServerIO(httpServer)
 
 // lectura de Json
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
-//app.use(express.static(path.join(__dirname+'/public')))
 app.use(express.static(__dirname+'/public'))
 
-connectDb()
-
-//Defino motor de plantillas para express
+//Motor de plantillas
 app.engine('handlebars', handlebars.engine())
-
-//Direccion de plantillas
-app.set('views',__dirname+'/views')
+app.set('views', __dirname+'/views' )
 app.set('view engine', 'handlebars')
+
+// Conexion a Socket.IO
+setupSocket(socketServer);
+
+//Conexion a MongoDB
+connectToMongo()
 
 //Rutas FS
 app.use('/products', productsRouter)
 app.use('/carts',productsCarts)
 app.use('/', viewsRouter)
 
-//Rutas Api
-app.use('/api/products', productsApiRouter)
-app.use('/api/users', usersRouter)
-app.use('/api/carts', cartsApiRouter)
+//Rutas de Socket.IO
+app.use('/realtimeproducts', realTimeProducts)
 
-
-//middleware
-app.use(productsSocket(io))
+//Rutas de la API
+app.use('/api/products', producsApiRoutes)
+app.use('/api/carts', cartApiRoutes)
 
 //Midlewere para los errores de servidor
 app.use((error, req, res, next) => {
@@ -54,8 +56,10 @@ app.use((error, req, res, next) => {
     res.status(500).send('Error 500 en el server')
 })
 
-// Guardar en una cont
-httpServer.listen(PORT, error => {
-    if(error) console.log(error)
-    console.log('Server escuchando en el puerto 8080')
+//Server escuchando port 8080
+httpServer.listen(PORT,error => {
+    if(error){
+        console.log(error)
+    }
+    console.log(`Server escuchando en el puerto ${PORT}`)
 })

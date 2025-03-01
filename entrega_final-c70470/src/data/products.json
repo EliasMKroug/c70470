@@ -9,5 +9,45 @@
     "stock": 150,
     "category": "almacen",
     "thumbnail": "Con imagen"
+  },
+  {
+    "id": 2,
+    "title": "Nuez",
+    "code": "1235",
+    "price": 2500,
+    "stock": 150,
+    "status": true,
+    "category": "almacen",
+    "thumbnail": "Sin imagen"
+  },
+  {
+    "id": 3,
+    "title": "Yerba",
+    "code": "1236",
+    "price": 1700,
+    "stock": 300,
+    "status": true,
+    "category": "almacen",
+    "thumbnail": "Sin imagen"
+  },
+  {
+    "id": 4,
+    "title": "Harina",
+    "code": "1237",
+    "price": 1600,
+    "stock": 140,
+    "status": true,
+    "category": "almacen",
+    "thumbnail": "Sin imagen"
+  },
+  {
+    "id": 5,
+    "title": "Fideo",
+    "code": "1232",
+    "price": 2000,
+    "stock": 10,
+    "status": true,
+    "category": "almacen",
+    "thumbnail": "Sin imagen"
   }
 ]
