@@ -5,9 +5,10 @@ class cartsMongo{
         this.model = cartsModel
     }
 
-    getCarts = async () => {
-        const carts = await this.model.find().lean()
-        return carts
+    getCartsById = async (uid) => {
+        const cartFinded = await this.model.findById(uid).populate('products.product')
+        const prodFinded = cartFinded?.products
+        return prodFinded
     }
 
     createCart = async () => {
@@ -17,41 +18,60 @@ class cartsMongo{
         } catch (error) {
             // Manejar el error de clave duplicada
             if (error.code === 11000) {
-                // Si el error es por clave duplicada, intenta actualizar en lugar de insertar
                 const existingCart = await this.model.findOneAndUpdate(
-                    { /* Puedes agregar aquí tu criterio de búsqueda, por ejemplo, el título */ },
-                    { $setOnInsert: { products: [] } }, // Establecer el campo products solo en la inserción
+                    {},
+                    { $setOnInsert: { products: [] } }, 
                     { upsert: true, new: true }
                 );
                 return existingCart;
             } else {
-                // Otro tipo de error, lanzar el error
                 throw error;
             }
         }
     }
 
+    updateCart = async (uid, products) => {
+        const cartFinded = await this.model.findById(uid).lean()
+        const newCart = {
+            ...cartFinded,
+            products
+        }
+        const cartUpdated = await this.model.findByIdAndUpdate(uid, newCart, { new: true })
+        return cartUpdated
+    }
+
     addProduct = async (uid, pid) => {
-        // Buscar el carrito por el ID del usuario
-        let cart = await this.model.findOne({ _id: uid });
-    
-        // Verificar si el carrito existe
-        if (!cart) {
+        const cartFinded = await this.model.findById(uid)
+        if (!cartFinded) {
             throw new Error('Carrito no encontrado');
         }
-        // Incrementar la cantidad si el producto ya está en el carrito
-        const existingProductIndex = cart.products.findIndex(item => item.product.toString() === pid);
+        const existingProductIndex = cartFinded.products.findIndex(item => item.product.toString() === pid);
         if (existingProductIndex !== -1) {
-            cart.products[existingProductIndex].quantity += 1;
+            cartFinded.products[existingProductIndex] = { product: cartFinded.products[existingProductIndex].product, quantity: cartFinded.products[existingProductIndex].quantity + 1 }
         } else {
             // Si el producto no está en el carrito, agregarlo con una cantidad de 1
-            cart.products.push({ product: pid, quantity: 1 });
+            cartFinded.products.push({ product: pid, quantity: 1 });
         }
         // Guardar los cambios en la base de datos
-        const resp = await this.model.findByIdAndUpdate({ _id: uid }, cart);
+        const cartUpdated = await this.model.findByIdAndUpdate(uid, cartFinded, { new: true },).populate('products.product')
     
-        return resp;
+        return cartUpdated;
     }
+
+    updateProductToCart = async (uid, pid, quantity) => {
+
+        const cartFinded = await this.model.findById(uid).lean()
+        
+        const indexProd = cartFinded.products.findIndex(prod => prod.product.toString() === pid)
+
+        cartFinded.products[indexProd] = { ...cartFinded.products[indexProd], quantity }
+
+        const cartUpdated = await this.model.findByIdAndUpdate(uid, cartFinded, { new: true }).populate('products.product')
+
+        return cartUpdated
+    }
+
+
     
 }
 

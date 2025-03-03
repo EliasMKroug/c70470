@@ -5,13 +5,27 @@ class productsMongo {
         this.model = productsModel
     }
 
-    getProducts = async () => { 
-        const products = await this.model.find().lean()
-        return products 
+    getProducts = async (queryProduct) => {
+        
+        const { limit = 10, page = 1, sort = '',  ...query} = queryProduct
+        const sortManager = {
+            'asc': 1,
+            'desc': -1
+        }
+
+        const products = await this.model.paginate(
+            {...query},
+            {
+                limit,
+                page,
+                ...(sort && {sort: { price: sortManager[sort] }}),
+                customLabels: { docs: 'payload' }
+            }
+        );
+        return products
     }
 
     getProductById = async (id) => {
-        
         try {
             const product = await this.model.findOne({_id: id})
             return product
@@ -22,23 +36,30 @@ class productsMongo {
         }
     }
 
-    addProduct = async (product) => {
+    addProduct = async (product, fileUploaded) => {
         try {
-            const newProduct = await this.model.create(product)
+            const newProduct = await this.model.create({ ... product,
+                thumbnail: fileUploaded,
+            })
             return newProduct
         } catch (error) {
-            // Manejo de errores
             console.error("Error al agregar el producto:", error);
             throw error;
         }
     }
 
-    updateProduct = async (pid,product) => {
+    updateProduct = async (req,id) => {
         try {
-            const updatedProduct = await this.model.updateOne({_id: pid},product)
-            return updatedProduct
+            const { body } = req
+            const product = body
+            const updateProduct = await this.model.findByIdAndUpdate(id, 
+                {
+                    ...product,
+                    ...(req?.file?.path && { thumbnail: req.file.path })
+                }, 
+                { new: true })
+            return updateProduct
         } catch (error) {
-            // Manejo de errores
             console.error("Error al actualizar el producto:", error);
             throw error;
         }
@@ -49,7 +70,6 @@ class productsMongo {
             const pDel = await this.model.deleteOne({_id: pid})
             return pDel
         } catch (error) {
-            // Manejo de errores
             console.error("Error al borrar el producto:", error);
             throw error;
         }

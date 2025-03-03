@@ -1,14 +1,15 @@
 import { Router } from 'express'
 //import { productsModel } from '../../model/products.model.js'
 import productsMongo from '../../dao/products.dao.js'
+import { uploader } from '../../utils.js'
 
 const router = Router()
 
 const productManager = new productsMongo
 
-//Enpoint productos
+//Enpoint productos con query params
 router.get('/', async (req, res) => {
-    const products = await productManager.getProducts()
+    const products = await productManager.getProducts(req.query)
     res.send({status: 'success', payload:products})
 })
 
@@ -16,29 +17,33 @@ router.get('/', async (req, res) => {
 router.get('/:uid', async (req, res) => {
     const { uid } = req.params
     const product = await productManager.getProductById(uid)
-    res.send({status: 'success', payload: product})
+    res.send({status: 'success', payload:product})
 })
 
 //Endpoint creacion de producto
-router.post('/', async (req, res)=>{
-    const { body } = req
-    const newProduct = await productManager.addProduct(body)
-    res.send({status: 'success', payload: newProduct})
+router.post('/', uploader.single("file"), async (req, res)=>{
+    if(!req.file) return res.status(402).json({ message: "Error en algun campo" })
+    
+    const thumbnail = req.file.path.split('public')[1]
+    const prod = req.body
+    const newProduct = await productManager.addProduct(prod, thumbnail)
+
+    res.status(201).json({status: 'success', payload: newProduct})
 })
 
 //Endpoint actualizar producto
-router.put('/:pid', async (req, res) => {
+router.put('/:pid', uploader.single('file'), async (req, res) => {
     const { pid } = req.params
-    const { body } = req
-    const updateProduct = await productManager.updateProduct(pid,body)
-    res.send({status: 'success', message: `Product ${pid} updated`, payload: updateProduct})
+    const updateProduct = await productManager.updateProduct(req,pid)
+    res.status(201).json({status: 'success', message: `Product updated`, payload: updateProduct})
 })
 
 //Endpint borrar productos
 router.delete('/:pid', async (req, res) => {
     const { pid } = req.params
     const productDel = await productManager.deleteProduct(pid)
-    res.send({ status: 'success', message: `Product ${pid} deleted`, payload: productDel});
+    const stat = productDel ? 200 : 400
+    res.status(stat).json({ message: `Product deleted`, payload: productDel});
 })
 
 
