@@ -1,0 +1,39 @@
+<div class="container mt-4">
+    {{#if productDetails}}
+    <div class="row align-items-center">
+        <!-- Imagen del producto -->
+        <div class="card col-md-5 text-center">
+            <img src="{{productDetails.thumbnail}}" class="img-fluid rounded shadow-sm" 
+                alt="{{productDetails.title}}" style="max-height: 600px; object-fit: cover;">
+        </div>
+
+        <!-- Detalles del producto -->
+        <div class="col-md-5">
+            <div class="card shadow-sm p-4">
+                <h2 class="fw-bold">{{productDetails.title}}</h2>
+                <p class="text-muted">Codigo: {{productDetails.code}}</p>
+                <p class="text-muted">{{productDetails.description}}</p>
+                <p class="text-muted">Cantidad total: {{productDetails.stock}}</p>
+                <h4 class="text-primary fw-bold">$ {{productDetails.price}}</h4>
+
+                <!-- Botón de agregar al carrito -->
+                <form action="/carts/67c5c5b63164a5a8fd538104/products/{{productDetails._id}}" method="POST">
+                <!-- Selección de cantidad -->
+                    <div class="d-flex align-items-center mt-3">
+                        <label for="quantity" class="me-2 fw-bold">Cantidad:</label>
+                        <input type="number" name="quantity" id="quantity" class="form-control text-center" 
+                            style="width: 80px;" min="1" value="1">
+                    </div>
+                    <div class="form-group p-2 d-grid gap-1">
+                        <button class="btn btn-success btn-block">
+                            Agregar al carrito
+                        </button>
+                        <a href="/products" class="btn btn-secondary">Cancelar</a>
+                    </div>                        
+                </form>
+
+            </div>
+        </div>
+    </div>
+    {{/if}}
+</div>

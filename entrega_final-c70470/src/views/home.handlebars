@@ -1,26 +1,44 @@
 <main>
-    <div class="container p-4">
-        {{#if role}}
-            <h2>Productos Disponibles: </h2>
-            <div class="row p-4">
-                {{#each productAll}}
-                    <div class="col-md-3 pd-4">
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title">Código del producto: {{this.id}}</h5>
-                                <p class="card-text">Nombre del producto: {{this.title}}</p>
-                                <p class="card-text">Precio: {{this.price}}</p>
-                                <p class="card-text">Código: {{this.code}}</p>
-                                <p class="card-text">Stock: {{this.stock}}</p>
-                            </div>
+    <div class="container py-4">
+        <h2 class="text-center mb-4">Productos Disponibles</h2>
+        
+        <div class="row">
+            {{#each productAll.payload}}
+                <div class="col-sm-3 mb-3">
+                    <div class="card h-100 shadow-sm">
+                        <img src="{{this.thumbnail}}" class="card-img-top p-4" alt="{{this.title}}" style="height: 300px; object-fit: cover;">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">{{this.title}}</h5>
+                            <p class="card-text"><strong>Precio:</strong> ${{this.price}}</p>
+                            <a href="/products/{{this._id}}" class="btn btn-primary w-100">Detalles</a>                            
                         </div>
                     </div>
-                {{/each}}
-            </div>
-        {{else}}
-            <h2>No puede ver los productos</h2>
-        {{/if}}
+                </div>
+            {{/each}}
+        </div>
+
+        <nav>
+            <ul class="pagination justify-content-center mt-4">
+                {{#if productAll.hasPrevPage}}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{productAll.prevPage}}" aria-label="Anterior">
+                            <span aria-hidden="true">&laquo; Anterior</span>
+                        </a>
+                    </li>
+                {{/if}}
+                
+                <li class="page-item active">
+                    <span class="page-link">Página {{productAll.page}} de {{productAll.totalPages}}</span>
+                </li>
+                
+                {{#if productAll.hasNextPage}}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{productAll.nextPage}}" aria-label="Siguiente">
+                            <span aria-hidden="true">Siguiente &raquo;</span>
+                        </a>
+                    </li>
+                {{/if}}
+            </ul>
+        </nav>
     </div>
 </main>
-<script src="/css/homeStyles.css"></script>
-

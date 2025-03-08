@@ -5,6 +5,7 @@ class cartsMongo{
         this.model = cartsModel
     }
 
+
     getCartsById = async (uid) => {
         const cartFinded = await this.model.findById(uid).populate('products.product')
         const prodFinded = cartFinded?.products
@@ -49,7 +50,6 @@ class cartsMongo{
         if (existingProductIndex !== -1) {
             cartFinded.products[existingProductIndex] = { product: cartFinded.products[existingProductIndex].product, quantity: cartFinded.products[existingProductIndex].quantity + 1 }
         } else {
-            // Si el producto no está en el carrito, agregarlo con una cantidad de 1
             cartFinded.products.push({ product: pid, quantity: 1 });
         }
         // Guardar los cambios en la base de datos
@@ -71,7 +71,38 @@ class cartsMongo{
         return cartUpdated
     }
 
-
+    deleteProductToCart = async (uid,pid) => {
+        const cartFinded = await this.model.findById(uid)
+        if (!cartFinded) {
+            throw new Error('Carrito no encontrado');
+        }
+        const existingProductIndex = cartFinded.products.findIndex(item => item.product.toString() === pid);
+        
+        // Guardar los cambios en la base de datos
+        await this.model.findByIdAndDelete(uid, existingProductIndex, { new: true },)
+        const cartDeleted = await this.model.findById(uid) 
+        return cartDeleted;
+    }
+    
+    deleteProductsToCart = async (uid, pid) => {
+        try {
+            const updatedCart = await this.model.findByIdAndUpdate(
+                uid,
+                { $pull: { products: { product: pid } } }, // Elimina el producto específico del array
+                { new: true } // Devuelve el carrito actualizado
+            );
+    
+            if (!updatedCart) {
+                throw new Error('Carrito no encontrado');
+            }
+    
+            return updatedCart;
+        } catch (error) {
+            console.error("Error al eliminar producto del carrito:", error);
+            throw error;
+        }
+    };
+    
     
 }
 

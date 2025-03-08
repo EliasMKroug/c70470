@@ -73,4 +73,17 @@
         }
     })
 
+    //Endpoint para Borrar productos
+    router.delete('/:uid/products/:pid', async (req, res) => {
+        try { 
+            const { uid, pid } = req.params
+            const delProductToCart = await cartsManager.deleteProductToCart(uid, pid) 
+            res.status(201).json({ message: ' Producto Borrado exitosamente ', payload: delProductToCart})
+        } catch (error) {
+            res.status(404).json({ message: ' No pudo agregarse producto porque no existe ', payload: error})
+            console.error("Error al agregar producto al carrito:", error);
+            throw error;
+        }
+    })
+
     export default router

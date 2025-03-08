@@ -1,0 +1,34 @@
+<main>
+    <div class="container py-4">
+        <h2 class="text-center mb-4">Mi carrito</h2>
+
+        <div class="card shadow-lg">
+            <ul class="list-group list-group-flush">
+                {{#each allProducts}}
+                <li class="list-group-item d-flex align-items-center justify-content-between">
+                    <!-- Imagen -->
+                    <img src="{{this.product.thumbnail}}" alt="{{this.product.title}}" 
+                         class="rounded border" 
+                         style="width: 80px; height: 80px; object-fit: cover;">
+
+                    <!-- Info del producto -->
+                    <div class="flex-grow-1 mx-3">
+                        <h5 class="mb-1 text-primary">{{this.product.title}}</h5>
+                        <p class="mb-0"><strong>Cantidad:</strong> {{this.quantity}}</p>
+                    </div>
+
+                    <!-- Botón de detalles -->
+                    <a href="/products/{{this.product._id}}" class="btn btn-outline-primary">Ver detalles</a>
+                    <form action="/carts/67c5c5b63164a5a8fd538104/products/{{this.product._id}}" method="POST">
+                        <div class="form-group p-2 d-grid gap-1">
+                            <button class="btn btn-danger btn-block">
+                                Borrar
+                            </button>
+                        </div>                        
+                    </form>
+                </li>
+                {{/each}}
+            </ul>
+        </div>
+    </div>
+</main>

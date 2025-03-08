@@ -1,162 +1,56 @@
 import { Router } from 'express'
-import { __dirname } from '../utils.js';
-import fs from 'fs'
-import path from 'path'  
+import productsMongo from '../dao/products.dao.js'
+import { uploader } from '../utils.js'
 
 const router = Router()
 
-//Creacion de productsManager
-class ProductManager {
-    constructor() {      
-        this.nextId = 1;
-        this.path = path.join(__dirname+'/data/products.json'); // Ruta del archivo
-        this.productsData = fs.readFileSync(this.path)
-        this.products = JSON.parse(this.productsData);           
-    }
-  
-    getProducts() {
-        //return this.products.sort((a, b) => a.id - b.id);
-        console.log(this.products)
-        return this.products;
-    }
+const productManager = new productsMongo
 
-    getProductById(id) {
-        const product = this.products.find((p) => p.id === id);
-        if (!product) {
-          throw new Error('Producto no encontrado');
-        }
-        return product;
-    }
-
-    addProduct(product) {
-      let existingProduct = this.products.find(p => p.id === product.id);
-      if (existingProduct) {
-        throw new Error('El código del producto ya está en uso.');
-      }
-      const id = this.nextId++;
-      const newProduct = { id, ...product};
-      this.products.push(newProduct);
-      this.saveToFile();
-      return newProduct;
-    }
-  
-    updateProduct(id, updatedFields) {
-      const index = this.products.findIndex((p) => p.id === id);
-      if (index === -1) {
-        throw new Error('Product not found');
-      }
-      this.products[index] = { ...this.products[index], ...updatedFields };
-      this.saveToFile();
-      return this.products[index];
-    }
-  
-    deleteProduct(id) {
-      const index = this.products.findIndex(p => p.id === id);
-      if (index === -1) {
-        throw new Error('Product not found');
-      }
-      this.products.splice(index, 1);
-      this.saveToFile();
-    }
-
-    saveToFile() {
-      fs.writeFileSync(this.path, JSON.stringify(this.products, null, 2), 'utf-8');
-    }
-
-
-}
-
-//INICIO DE CRUD
-
-//Defino mi clase ProductManager
-const productManager = new ProductManager()
-
-//Endpoint para veo todos los productos
-router.get('/', (req, res) => {
-    let productsAll = productManager.getProducts()
-    const limit = parseInt(req.query.limit);
-    if (limit) {
-        console.log(limit)
-        res.json(productsAll.slice(0, limit));
-    } else {
-        res.json(productsAll);
-    }
+//Enpoint productos con query params
+router.get('/', async (req, res) => {
+    const productAll = await productManager.getProducts(req.query)
+    res.render('home', { productAll })
 })
 
-router.get('/', (req, res) => {
-    let productsAll = productManager.getProducts().sort((a, b) => a.id - b.id);
-    const limit = parseInt(req.query.limit);
-    if (limit) {
-        res.json(productsAll.slice(0, limit));
-    } else {
-        res.json(productsAll);
-    }
-});
-
-//Endpoint para filtar producto especifico
-router.get('/:pid', (req, res) => {
-    let productId = parseInt(req.params.pid)
+//Endpoint productos por id
+router.get('/:uid', async (req, res) => {
     try {
-    const productById = productManager.getProductById(productId);
-    res.json(productById);
+        const { uid } = req.params
+        const productDetails = await productManager.getProductById(uid)
+        res.render('proDetails', { productDetails })
+        //res.send({status: 'success', payload:product})
     } catch (error) {
-    res.status(404).json({ error: 'El producto no existe' });
+        console.error("Error al obtener producto:", error);
+        res.status(500).send("Error al cargar los productos");
     }
+
 })
 
-//Endpoint para agregar producto
-router.post('/', (req, res) => {
-    try {
-        // Extraer los datos del cuerpo de la solicitud
-        const { title, description, code, price, status, stock, category, thumbnail } = req.body;
-        // Verificar si todos los campos obligatorios están presentes
-        if (!title || !description || !code || !price || !status || !stock || !category) {
-            throw new Error('Todos los campos son obligatorios.');
-        }
-        // Crear el nuevo objeto de producto
-        const newProduct = {
-            id: productManager.nextId++,
-            title,
-            description,
-            code,
-            price,
-            status,
-            stock,
-            category,
-            thumbnail:"Sin imagen"
-        };
-        productManager.addProduct(newProduct);
-        res.status(201).json(newProduct);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-});
+//Endpoint creacion de producto
+router.post('/', uploader.single("file"), async (req, res)=>{
+    if(!req.file) return res.status(402).json({ message: "Error en algun campo" })
+    
+    const thumbnail = req.file.path.split('public')[1]
+    const prod = req.body
+    const newProduct = await productManager.addProduct(prod, thumbnail)
 
-// Endpoint para actualizar un producto por ID
-router.put('/:pid', (req, res) => {
-    const productId = parseInt(req.params.pid);
-    const updatedFields = req.body;
-    try {
-        // Verificar si se proporcionaron campos para actualizar
-        if (Object.keys(updatedFields).length === 0) {
-            throw new Error('No se proporcionaron campos para actualizar.');
-        }
-        const updatedProduct = productManager.updateProduct(productId, updatedFields);
-        res.json(updatedProduct);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-});
+    res.status(201).json({status: 'success', payload: newProduct})
+})
 
-// Endpoint para eliminar un producto por ID
-router.delete('/:pid', (req, res) => {
-    const productId = parseInt(req.params.pid);
-    try {
-        productManager.deleteProduct(productId);
-        res.status(200).json({ message: 'Producto eliminado exitosamente' });
-    } catch (error) {
-        res.status(404).json({ error: error.message });
-    }
-});
+//Endpoint actualizar producto
+router.put('/:pid', uploader.single('file'), async (req, res) => {
+    const { pid } = req.params
+    const updateProduct = await productManager.updateProduct(req,pid)
+    res.status(201).json({status: 'success', message: `Product updated`, payload: updateProduct})
+})
+
+//Endpint borrar productos
+router.delete('/:pid', async (req, res) => {
+    const { pid } = req.params
+    const productDel = await productManager.deleteProduct(pid)
+    const stat = productDel ? 200 : 400
+    res.status(stat).json({ message: `Product deleted`, payload: productDel});
+})
+
 
 export default router
