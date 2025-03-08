@@ -5,6 +5,7 @@ import { Server as ServerHttp } from 'http';
 import { __dirname } from './utils.js';
 import { engine } from 'express-handlebars';
 
+
 //  Rutas de Socket.IO  
 import realTimeProducts, { setupSocket } from './routes/realTimeProducts.route.js';
 

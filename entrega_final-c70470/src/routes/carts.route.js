@@ -27,8 +27,7 @@ router.post('/:uid/products/:pid', async (req, res) => {
     try { 
         console.log(quantity)
         if (quantity > 1) {
-            const updateProducts = await cartsManager.updateProductToCart(uid,pid,quantity)
-            console.log('Se agrego producto exitosamente', { updateProducts }) 
+            await cartsManager.updateProductToCart(uid,pid,quantity)
             res.redirect(`/carts/${uid}`)
         } else {
             const allProducts = await cartsManager.addProduct(uid, pid)
@@ -43,12 +42,11 @@ router.post('/:uid/products/:pid', async (req, res) => {
     }
 })
 
-
 //Endpoint para Borrar productos
-router.delete('/:uid/products/:pid', async (req, res) => {
+router.post('/:uid/products/:pid/delete', async (req, res) => {
     try {
         const { uid, pid } = req.params
-        await cartsManager.deleteProductToCart(uid, pid)
+        await cartsManager.deleteProductsToCart(uid, pid)
         res.redirect(`/carts/${uid}`)
     } catch (error) {
         res.status(404).json({ message: 'Error al eliminar el producto', payload: error })

@@ -85,22 +85,18 @@ class cartsMongo{
     }
     
     deleteProductsToCart = async (uid, pid) => {
-        try {
-            const updatedCart = await this.model.findByIdAndUpdate(
-                uid,
-                { $pull: { products: { product: pid } } }, // Elimina el producto específico del array
-                { new: true } // Devuelve el carrito actualizado
-            );
-    
-            if (!updatedCart) {
-                throw new Error('Carrito no encontrado');
-            }
-    
-            return updatedCart;
-        } catch (error) {
-            console.error("Error al eliminar producto del carrito:", error);
-            throw error;
+        const updatedCart = await this.model.findByIdAndUpdate(
+            uid,
+            { $pull: { products: { product: pid } } }, // Elimina el producto específico del array
+            { new: true } // Devuelve el carrito actualizado
+        );
+
+        if (!updatedCart) {
+            throw new Error('Carrito no encontrado');
         }
+
+        return updatedCart;
+
     };
     
     
